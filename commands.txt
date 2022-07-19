@@ -1,0 +1,29 @@
+
+#-pregled hard diskova u power shellu
+#docker volume ls(prikaz svih hard diskova)
+#docker volume inspect v6_dbdata(info o nekom)
+
+#izlistavanje svih mreza
+#docker network ls
+#docker network inspect imeMreze
+
+
+#za docker swarm
+#cd putanja do root-a projekta
+#docker swarm init --advertise-addr 127.0.0.1
+#docker stack deploy --compose-file stack.yaml application_stack
+#docker service ls
+#docker service ps imeServisa(izlistavanje kontejnera servisa)
+#docker swarm leave --force
+
+#python -m pip install --upgrade pip
+#pip install python-dateutil --upgrade
+
+#cd authentification
+#python manage.py db init
+#python manage.py db migrate -m "Initial migration"
+#python manage.py db upgrade
+
+
+#(ova prva moja, dobra) -komanda za pokretanje svih testova
+#python main.py --type all --with-authentication  --authentication-address http://127.0.0.1:5000 --jwt-secret JWT_SECRET_KEY --roles-field roles --administrator-role admin --customer-role customer --warehouse-role manager --customer-address http://127.0.0.1:5002 --warehouse-address http://127.0.0.1:5001 --administrator-address http://127.0.0.1:5003

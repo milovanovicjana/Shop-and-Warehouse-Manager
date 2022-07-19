@@ -1,0 +1,125 @@
+version: '3'
+services:
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - authenticationNet
+      - adminNet
+      - customerNet
+      - daemonNet
+      - managerNet
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - daemonNet
+      - managerNet
+
+  authenticationDB:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    volumes:
+    - authenticationdbdata:/var/lib/mysql
+    networks:
+      - authenticationNet
+  authenticationDBMigration:
+    image: authenticationdbmigration
+    environment:
+      - DATABASE_URL=authenticationDB
+    networks:
+      - authenticationNet
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=authenticationDB
+    ports:
+    - 5000:5000
+    networks:
+      - authenticationNet
+
+
+  shopDB:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+    volumes:
+      - shopdbdata:/var/lib/mysql
+    networks:
+      - adminNet
+      - customerNet
+      - daemonNet
+
+  shopDBMigration:
+    image: shopdbmigration
+    environment:
+      - DATABASE_URL=shopDB
+    networks:
+      - adminNet
+
+  manager:
+    image: manager
+    environment:
+      - REDIS_URL=redis
+    ports:
+      - 5001:5001
+    networks:
+      - managerNet
+    deploy:
+      replicas: 3
+
+  daemon:
+    image: daemon
+    environment:
+      - DATABASE_URL=shopDB
+      - REDIS_URL=redis
+    networks:
+      - daemonNet
+
+  customer:
+    image: customer
+    environment:
+      - DATABASE_URL=shopDB
+    ports:
+      - 5002:5002
+    networks:
+      - customerNet
+    deploy:
+      replicas: 3
+
+  admin:
+    image: admin
+    environment:
+      - DATABASE_URL=shopDB
+    ports:
+      - 5003:5003
+    networks:
+      - adminNet
+
+volumes:
+  authenticationdbdata:
+  shopdbdata:
+networks:
+  authenticationNet:
+    driver: overlay
+  adminNet:
+     driver: overlay
+  customerNet:
+     driver: overlay
+  managerNet:
+     driver: overlay
+  daemonNet:
+     driver: overlay
+
+#ovaj driver se koristi za kreiranje mreza pomocu koje kontejneri komuniciraju a nalaze se na drugim serverima
